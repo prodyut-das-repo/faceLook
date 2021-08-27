@@ -2,10 +2,13 @@ import React, { useState } from 'react'
 import './LoginComponent.css';
 import SweetAlert from 'react-bootstrap-sweetalert';
 import { getAllUsers } from './../services/service';
+import Button from 'react-bootstrap-button-loader';
 
 export default function LoginComponent() {
     const [state, setState] = useState({ show: false });
     const [loginData, setData] = useState({ username: '', password: '' });
+    const [errorMessage, setErrorMessage] = useState('');
+    const [loader, setLoader] = useState(false);
     const onConfirm = () => {
         setState({ show: false });
     }
@@ -13,18 +16,25 @@ export default function LoginComponent() {
         setState({ show: true });
     }
     const login = (event) => {
+        setLoader(true);
         if (loginData.username && loginData.password) {
             getAllUsers('https://611d20157d273a0017e2f68d.mockapi.io/users').then(res => {
-                console.log(res);
                 const userData = res.find(ele => ele.userName === loginData.username);
                 console.log(userData);
-                if (userData) {
+                if (userData && userData !== undefined) {
                     if (userData.password === loginData.password) {
-                        alert('Logged In')
+                        alert('Logged In');
+                        setErrorMessage("");
+                        setLoader(false);
                     }
                     else {
-                        alert('Incorrect password! please try again')
+                        setErrorMessage("Incorrect password!");
+                        setLoader(false);
                     }
+                }
+                else {
+                    setErrorMessage("Incorrect username/password!");
+                    setLoader(false);
                 }
             });
         }
@@ -58,7 +68,7 @@ export default function LoginComponent() {
                                 <td><input name="password" value={loginData.password} type="password" onChange={handleData} className="form-control inputtext m-0" />
                                 </td>
                                 <td>
-                                    <div className="btn" id="button" onClick={login}>Log In</div>
+                                    <Button className="btn" id="button" onClick={login} loading={loader}>{loader ? '' : 'Log In'}</Button>
                                 </td>
                             </tr>
                             <tr>
@@ -69,6 +79,11 @@ export default function LoginComponent() {
                                     </div>
                                 </td>
                                 <td className="row2 h">Forgot your password?</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span className="error">{errorMessage}</span>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
