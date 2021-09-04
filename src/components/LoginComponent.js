@@ -39,7 +39,8 @@ export default function LoginComponent() {
             });
         }
         else {
-            alert("Please enter credentials!")
+            alert("Please enter credentials!");
+            setLoader(false);
         }
         event.preventDefault();
     }
